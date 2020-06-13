@@ -1,4 +1,4 @@
-package DataBase.UrlGetters;
+package DataBase.UrlGetter;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;

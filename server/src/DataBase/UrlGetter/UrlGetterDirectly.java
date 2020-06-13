@@ -1,4 +1,4 @@
-package DataBase.UrlGetters;
+package DataBase.UrlGetter;
 
 public class UrlGetterDirectly extends UrlGetter {
 	@Override

@@ -1,6 +1,7 @@
 package DataBase;
 
-import DataBase.UrlGetters.UrlGetter;
+import DataBase.CredentialsGetter.CredentialsGetter;
+import DataBase.UrlGetter.UrlGetter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,10 +24,10 @@ public class DataBaseManager {
 	
 	private Connection connection;
 	
-	public DataBaseManager(UrlGetter urlGetter, String user, String pass) {
+	public DataBaseManager(UrlGetter urlGetter, CredentialsGetter credentialsGetter) {
 		try {
 			String url = urlGetter.getUrl();
-			connection = DriverManager.getConnection(url, user, pass);
+			connection = DriverManager.getConnection(url, credentialsGetter.getLogin(), credentialsGetter.getPassword());
 		} catch (SQLException throwables) {
 			System.out.println("Connection to database failed");
 			throwables.printStackTrace();

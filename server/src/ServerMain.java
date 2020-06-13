@@ -1,3 +1,5 @@
+import DataBase.DataBaseManager;
+import DataBase.UrlGetters.UrlGetterSsh;
 import Errors.InputErrors.InputError;
 import Utils.Context;
 
@@ -13,8 +15,8 @@ public class ServerMain {
 		String CSVFilePath = argsGetter.getCSVFilePath();
 		logger.info(String.format("port: %d\t\tcsv file path: %s\n", port, CSVFilePath));
 		
+		new DataBaseManager(new UrlGetterSsh(), "s284698", "rpp013");
 		Context context = new Context();
-		
 		context.loadCollection(CSVFilePath);
 		
 		try {

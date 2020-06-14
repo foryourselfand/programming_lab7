@@ -13,11 +13,6 @@ public class CommandHelp extends Command {
 	}
 	
 	@Override
-	public User getUser() {
-		return new User("login1", "password1", "salt1");
-	}
-	
-	@Override
 	public void execute() {
 		Iterator<Command> commands = this.context.commandsHolder.getCommands();
 		commands.forEachRemaining(command->stringBuilderResponse.append(command.getFullInformation()).append("\n"));

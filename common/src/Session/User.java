@@ -3,25 +3,23 @@ package Session;
 import java.io.Serializable;
 
 public class User implements Serializable {
-	private String login;
+	private String username;
 	private String password;
-	private String salt;
 	
 	public User() {
 	}
 	
-	public User(String login, String password, String salt) {
-		this.login = login;
+	public User(String username, String password) {
+		this.username = username;
 		this.password = password;
-		this.salt = salt;
 	}
 	
-	public String getLogin() {
-		return login;
+	public String getUsername() {
+		return username;
 	}
 	
-	public void setLogin(String login) {
-		this.login = login;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 	public String getPassword() {
@@ -32,20 +30,12 @@ public class User implements Serializable {
 		this.password = password;
 	}
 	
-	public String getSalt() {
-		return salt;
-	}
-	
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
 	
 	@Override
 	public String toString() {
 		return "User{" +
-				"login='" + login + '\'' +
+				"login='" + username + '\'' +
 				", password='" + password + '\'' +
-				", salt='" + salt + '\'' +
 				'}';
 	}
 }

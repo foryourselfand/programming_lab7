@@ -1,18 +1,11 @@
 package Commands;
 
-import Session.User;
-
 /**
  * Команда вывода в стандартный поток информации о коллекции (тип, дата инициализации, количество элементов и т.д.)
  */
-public class CommandInfo extends Command {
+public class CommandInfo extends Command implements CommandAuthorized {
 	public CommandInfo() {
 		super();
-	}
-	
-	@Override
-	public User getUser() {
-		return new User("login2", "password2", "salt2");
 	}
 	
 	@Override

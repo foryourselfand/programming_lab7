@@ -29,7 +29,6 @@ public class CommandSave extends CommandWithNotEmptyCollection {
 		stringBuilderResponse.append("Коллекция сохранена в файл\n");
 	}
 	
-	
 	@Override
 	public String getName() {
 		return "save";

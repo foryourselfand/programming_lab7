@@ -29,6 +29,8 @@ public class CommandsHolder {
 	
 	public void setUpCommands() {
 		this
+				.addCommand(new CommandLogin())
+				.addCommand(new CommandRegister())
 				.addCommand(new CommandHelp())
 				.addCommand(new CommandInfo())
 				.addCommand(new CommandShow())

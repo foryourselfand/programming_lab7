@@ -2,9 +2,14 @@ package DataBase;
 
 import DataBase.CredentialsGetter.CredentialsGetter;
 import DataBase.UrlGetter.UrlGetter;
+import Session.User;
+import Utils.Characters;
+import Utils.PasswordEncoder;
+import Utils.RandomSequenceGenerator;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +36,27 @@ public class DataBaseManager {
 		} catch (SQLException throwables) {
 			System.out.println("Connection to database failed");
 			throwables.printStackTrace();
+		}
+	}
+	
+	public void addUser(User user) {
+		String salt = RandomSequenceGenerator.getRandomSequence(
+				10,
+				Characters.LOWERCASE,
+				Characters.UPPERCASE,
+				Characters.DIGITS,
+				Characters.SPECIAL
+		);
+		
+		String hash = PasswordEncoder.getHash(user.getPassword(), salt);
+		try {
+			PreparedStatement statement = connection.prepareStatement("insert into users values (?, ?, ?)");
+			statement.setString(1, user.getUsername());
+			statement.setString(2, hash);
+			statement.setString(3, salt);
+			statement.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }

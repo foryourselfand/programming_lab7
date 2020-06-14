@@ -13,12 +13,9 @@ public class ServerMain {
 	public static void main(String[] args) {
 		ServerArgsGetter argsGetter = new ServerArgsGetter(args);
 		int port = argsGetter.getPort();
-		String CSVFilePath = argsGetter.getCSVFilePath();
-		logger.info(String.format("port: %d\t\tcsv file path: %s\n", port, CSVFilePath));
+		logger.info(String.format("port: %d\n", port));
 		
-		new DataBaseManager(new UrlGetterSsh(), new CredentialsGetterRaw());
 		Context context = new Context();
-		context.loadCollection(CSVFilePath);
 		
 		try {
 			Server.connect(port);

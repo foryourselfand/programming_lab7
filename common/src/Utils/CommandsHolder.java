@@ -38,7 +38,6 @@ public class CommandsHolder {
 				.addCommand(new CommandUpdateById())
 				.addCommand(new CommandRemoveById())
 				.addCommand(new CommandClear())
-				.addCommand(new CommandLoad())
 				.addCommand(new CommandExecuteScript())
 				.addCommand(new CommandExit())
 				.addCommand(new CommandAddIfMax())

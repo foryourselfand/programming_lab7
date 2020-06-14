@@ -1,7 +1,6 @@
 import Commands.Command;
 import Commands.CommandAuthorized;
 import Commands.CommandExit;
-import Commands.CommandSave;
 import Errors.ConnectionError;
 import Errors.InputErrors.InputError;
 import Session.SessionClientServer;
@@ -78,11 +77,10 @@ public class Server {
 		Future<SessionServerClient> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
 		SessionServerClient session = responseFuture.get();
 		
-		sendResponse(context, session);
-		
+		sendResponse(session);
 	}
 	
-	private static void sendResponse(Context context, SessionServerClient session) {
+	private static void sendResponse(SessionServerClient session) {
 		Callable<Void> callableRequestSender = new CallableRequestSender(session);
 		ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
 		
@@ -91,12 +89,12 @@ public class Server {
 	
 	public static String processCommand(Context context, Command command, User user, CommandsHistoryManager commandsHistoryManager) {
 		if (command instanceof CommandExit) {
-			try {
-				Command commandSave = new CommandSave();
-				commandSave.validateArguments(new String[]{TempFileManager.getTempFilePath()});
-				commandSave.showDescriptionAndExecute(context);
-			} catch (InputError ignored) {
-			}
+//			try {
+//				Command commandSave = new CommandSave();
+//				commandSave.validateArguments(new String[]{TempFileManager.getTempFilePath()});
+//				commandSave.showDescriptionAndExecute(context);
+//			} catch (InputError ignored) {
+//			}
 			return command.getDescription();
 		}
 		

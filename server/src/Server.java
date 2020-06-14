@@ -22,9 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
-	public static final int nThreadFixed = 10;
-	public static final int nThreadCached = 10;
 	public static final Logger logger = Logger.getLogger(Server.class.getName());
+	public static final int nThreadFixed = 10;
 	
 	private static final int DEFAULT_BUFFER_SIZE = 65536;
 	private static final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
@@ -75,19 +74,19 @@ public class Server {
 	private static void proceedRequest(Context context, byte[] copyData) throws InterruptedException, ExecutionException {
 		Callable<String> callableRequestProceed = new CallableRequestProceed(context, copyData);
 		ExecutorService executorServiceRequestProceed = Executors.newCachedThreadPool();
-		for (int i = 0; i < nThreadCached; i++) {
-			Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
-			String response = responseFuture.get();
-			
-			sendResponse(context, response);
-		}
+		
+		Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
+		String response = responseFuture.get();
+		
+		sendResponse(context, response);
+		
 	}
 	
 	private static void sendResponse(Context context, String response) {
 		Callable<Void> callableRequestSender = new CallableRequestSender(response, context.commandsHistoryManager);
 		ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
-		for (int j = 0; j < 42; j++)
-			executorServiceRequestSender.submit(callableRequestSender);
+		
+		executorServiceRequestSender.submit(callableRequestSender);
 	}
 	
 	public static String processCommand(Context context, Command command, User user) {

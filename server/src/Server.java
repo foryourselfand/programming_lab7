@@ -9,7 +9,6 @@ import Session.User;
 import Utils.CommandsHistoryManager;
 import Utils.Context;
 import Utils.SerializationManager;
-import Utils.TempFileManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -87,28 +86,20 @@ public class Server {
 		executorServiceRequestSender.submit(callableRequestSender);
 	}
 	
-	public static String processCommand(Context context, Command command, User user, CommandsHistoryManager commandsHistoryManager) {
+	public static void processCommand(Context context, Command command, SessionServerClient session) {
 		if (command instanceof CommandExit) {
-//			try {
-//				Command commandSave = new CommandSave();
-//				commandSave.validateArguments(new String[]{TempFileManager.getTempFilePath()});
-//				commandSave.showDescriptionAndExecute(context);
-//			} catch (InputError ignored) {
-//			}
-			return command.getDescription();
+			session.append(command.getDescription());
 		}
 		
 		if (command instanceof CommandAuthorized) {
-			System.out.println(user);
+			System.out.println(session.getUser());
 		}
 		
 		try {
-			command.setCommandsHistoryManager(commandsHistoryManager);
-			command.showDescriptionAndExecute(context);
-			commandsHistoryManager.addCommandToHistory(command);
-			return command.getResponse();
+			command.showDescriptionAndExecute(context, session);
+			session.getCommandsHistoryManager().addCommandToHistory(command);
 		} catch (InputError inputError) {
-			return inputError.getMessage() + "\n";
+			session.append(inputError.getMessage()).append("\n");
 		}
 	}
 	
@@ -141,9 +132,10 @@ public class Server {
 			CommandsHistoryManager commandsHistoryManagerReceived = sessionClientServer.getCommandsHistoryManager();
 			
 			logger.log(Level.INFO, "Server receive command" + commandReceived);
-			String response = processCommand(context, commandReceived, userReceived, commandsHistoryManagerReceived);
+			SessionServerClient sessionServerClient = new SessionServerClient(commandsHistoryManagerReceived, userReceived);
+			processCommand(context, commandReceived, sessionServerClient);
 			logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
-			return new SessionServerClient(commandsHistoryManagerReceived, response);
+			return sessionServerClient;
 		}
 	}
 	
@@ -156,6 +148,7 @@ public class Server {
 		
 		@Override
 		public Void call() throws IOException {
+			session.createMessage();
 			byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(session);
 			ByteBuffer byteBuffer = ByteBuffer.wrap(sessionBytes);
 			channel.send(byteBuffer, address);

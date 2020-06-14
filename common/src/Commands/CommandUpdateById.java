@@ -4,12 +4,13 @@ import Expectations.Argument;
 import Expectations.ExpectedIdExist;
 import Expectations.ExpectedType.ExpectedLong;
 import Input.Flat;
+import Session.SessionServerClient;
 import Utils.Context;
 import Utils.FlatCreator;
 
 import java.util.List;
 
-public class CommandUpdateById extends CommandWithNotEmptyCollection implements CommandAuthorized{
+public class CommandUpdateById extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	private Flat flatNew;
 	
 	public CommandUpdateById() {
@@ -29,24 +30,24 @@ public class CommandUpdateById extends CommandWithNotEmptyCollection implements 
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 		long idToRemove = Long.parseLong(commandArguments[0]);
-		removeFlatOld(idToRemove);
-		addFlatNew(flatNew);
+		removeFlatOld(context, session, idToRemove);
+		addFlatNew(context, session, flatNew);
 	}
 	
 	private Flat createFlatNew() {
 		return FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
 	}
 	
-	private void removeFlatOld(long idToRemove) {
-		this.context.collectionManager.removeFlatFromCollectionById(idToRemove);
-		stringBuilderResponse.append("Из коллекции удален элемент с id ").append(idToRemove).append("\n");
+	private void removeFlatOld(Context context, SessionServerClient session, long idToRemove) {
+		context.collectionManager.removeFlatFromCollectionById(idToRemove);
+		session.append("Из коллекции удален элемент с id ").append(idToRemove).append("\n");
 	}
 	
-	private void addFlatNew(Flat flatNew) {
+	private void addFlatNew(Context context, SessionServerClient session, Flat flatNew) {
 		context.collectionManager.addFlatToCollection(flatNew);
-		stringBuilderResponse.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
+		session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 	}
 	
 	@Override

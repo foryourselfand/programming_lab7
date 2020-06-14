@@ -1,6 +1,8 @@
 package Commands;
 
 import Input.Flat;
+import Session.SessionServerClient;
+import Utils.Context;
 
 public class CommandAverageOfHeight extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	public CommandAverageOfHeight() {
@@ -8,13 +10,13 @@ public class CommandAverageOfHeight extends CommandWithNotEmptyCollection implem
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 		double heightAverage = context.collectionManager.getCollection().stream().
 				mapToDouble(Flat::getHeight).
 				average().
 				orElse(0);
 		
-		stringBuilderResponse.append(String.format("Среднее значение поля height для всех элементов коллекции: %.2f\n", heightAverage));
+		session.append(String.format("Среднее значение поля height для всех элементов коллекции: %.2f\n", heightAverage));
 	}
 	
 	@Override

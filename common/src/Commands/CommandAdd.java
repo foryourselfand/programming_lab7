@@ -1,6 +1,7 @@
 package Commands;
 
 import Input.Flat;
+import Session.SessionServerClient;
 import Utils.Context;
 import Utils.FlatCreator;
 
@@ -17,9 +18,9 @@ public class CommandAdd extends Command implements CommandAuthorized {
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 		context.collectionManager.addFlatToCollection(flatNew);
-		stringBuilderResponse.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
+		session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 	}
 	
 	@Override

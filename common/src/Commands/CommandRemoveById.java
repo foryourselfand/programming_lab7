@@ -3,6 +3,8 @@ package Commands;
 import Expectations.Argument;
 import Expectations.ExpectedIdExist;
 import Expectations.ExpectedType.ExpectedLong;
+import Session.SessionServerClient;
+import Utils.Context;
 
 import java.util.List;
 
@@ -19,10 +21,10 @@ public class CommandRemoveById extends CommandWithNotEmptyCollection implements 
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 		long idToRemove = Long.parseLong(commandArguments[0]);
-		this.context.collectionManager.removeFlatFromCollectionById(idToRemove);
-		stringBuilderResponse.append("Из коллекции удален элемент с id ").append(idToRemove).append("\n");
+		context.collectionManager.removeFlatFromCollectionById(idToRemove);
+		session.append("Из коллекции удален элемент с id ").append(idToRemove).append("\n");
 	}
 	
 	@Override

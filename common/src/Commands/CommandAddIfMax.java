@@ -1,6 +1,7 @@
 package Commands;
 
 import Input.Flat;
+import Session.SessionServerClient;
 import Utils.Context;
 import Utils.FlatCreator;
 
@@ -13,45 +14,44 @@ public class CommandAddIfMax extends Command implements CommandAuthorized {
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
+		session.append("Новый элемент ").append(flatNew.toString()).append("\n");
 		if (context.collectionManager.getIsCollectionEmpty()) {
 			context.collectionManager.addFlatToCollection(flatNew);
-			stringBuilderResponse.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
+			session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 		} else {
-			Flat flatMax = getFlatMax();
-			addFlatNewToCollectionIfGreaterThatFlatMax(flatNew, flatMax);
+			Flat flatMax = getFlatMax(context, session);
+			addFlatNewToCollectionIfGreaterThatFlatMax(context, session, flatNew, flatMax);
 		}
 	}
 	
 	private Flat getFlatNew() {
-		Flat flatNew = FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
-		stringBuilderResponse.append("Новый элемент ").append(flatNew.toString()).append("\n");
-		return flatNew;
+		return FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
 	}
 	
-	private Flat getFlatMax() {
+	private Flat getFlatMax(Context context, SessionServerClient session) {
 		Flat flatMax = context.collectionManager.getFlatMax();
-		stringBuilderResponse.append("Наибольший элемент коллекции ").append(flatMax.toString()).append("\n");
+		session.append("Наибольший элемент коллекции ").append(flatMax.toString()).append("\n");
 		System.out.println();
 		return flatMax;
 	}
 	
-	private void addFlatNewToCollectionIfGreaterThatFlatMax(Flat flatNew, Flat flatMax) {
+	private void addFlatNewToCollectionIfGreaterThatFlatMax(Context context, SessionServerClient session, Flat flatNew, Flat flatMax) {
 		if (flatNew.compareTo(flatMax) > 0)
-			addFlatNewToCollection(flatNew);
+			addFlatNewToCollection(context, session, flatNew);
 		else
-			dontAddFlatNewToCollection();
+			dontAddFlatNewToCollection(session);
 	}
 	
-	private void addFlatNewToCollection(Flat flatNew) {
-		stringBuilderResponse.append("Значение нового элемента превышает значение наибольшего элемента коллекции\n");
+	private void addFlatNewToCollection(Context context, SessionServerClient session, Flat flatNew) {
+		session.append("Значение нового элемента превышает значение наибольшего элемента коллекции\n");
 		context.collectionManager.addFlatToCollection(flatNew);
-		stringBuilderResponse.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
+		session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 	}
 	
-	private void dontAddFlatNewToCollection() {
-		stringBuilderResponse.append("Значение нового элемента не превышает значение наибольшего элемента коллекции\n");
-		stringBuilderResponse.append("В коллекцию элемент не добавлен");
+	private void dontAddFlatNewToCollection(SessionServerClient session) {
+		session.append("Значение нового элемента не превышает значение наибольшего элемента коллекции\n");
+		session.append("В коллекцию элемент не добавлен");
 	}
 	
 	@Override

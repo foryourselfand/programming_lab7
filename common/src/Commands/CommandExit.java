@@ -1,12 +1,15 @@
 package Commands;
 
+import Session.SessionServerClient;
+import Utils.Context;
+
 public class CommandExit extends Command {
 	public CommandExit() {
 		super();
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 		exit();
 	}
 	

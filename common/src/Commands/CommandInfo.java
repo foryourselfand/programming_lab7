@@ -1,5 +1,8 @@
 package Commands;
 
+import Session.SessionServerClient;
+import Utils.Context;
+
 /**
  * Команда вывода в стандартный поток информации о коллекции (тип, дата инициализации, количество элементов и т.д.)
  */
@@ -9,11 +12,11 @@ public class CommandInfo extends Command implements CommandAuthorized {
 	}
 	
 	@Override
-	public void execute() {
-		stringBuilderResponse.append("Тип коллекции: ").append(context.collectionManager.getCollectionType()).append("\n");
-		stringBuilderResponse.append("Тип элементов коллекции: ").append(context.collectionManager.getCollectionElementType()).append("\n");
-		stringBuilderResponse.append("Дата инициализации коллекции: ").append(context.collectionManager.getCollectionInitializationDate()).append("\n");
-		stringBuilderResponse.append("Количество элементов в коллекции: ").append(context.collectionManager.getCollectionSize()).append("\n");
+	public void execute(Context context, SessionServerClient session) {
+		session.append("Тип коллекции: ").append(context.collectionManager.getCollectionType()).append("\n");
+		session.append("Тип элементов коллекции: ").append(context.collectionManager.getCollectionElementType()).append("\n");
+		session.append("Дата инициализации коллекции: ").append(context.collectionManager.getCollectionInitializationDate()).append("\n");
+		session.append("Количество элементов в коллекции: ").append(context.collectionManager.getCollectionSize()).append("\n");
 	}
 	
 	@Override

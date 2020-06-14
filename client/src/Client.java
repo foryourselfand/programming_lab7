@@ -59,9 +59,8 @@ public class Client {
 			
 			commandsHistoryManager = commandsHistoryManagerReceived;
 			
-			
 			if (command instanceof CommandExit)
-				command.execute();
+				System.exit(42);
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}

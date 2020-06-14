@@ -1,8 +1,11 @@
 package Commands;
 
+import Session.SessionServerClient;
+import Utils.Context;
+
 public class CommandLogin extends CommandAuthorization {
 	@Override
-	public void execute() {
+	public void execute(Context context, SessionServerClient session) {
 	}
 	
 	@Override

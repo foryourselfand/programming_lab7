@@ -1,14 +1,17 @@
 package Commands;
 
+import Session.SessionServerClient;
+import Utils.Context;
+
 public class CommandClear extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	public CommandClear() {
 		super();
 	}
 	
 	@Override
-	public void execute() {
-		this.context.collectionManager.getCollection().clear();
-		stringBuilderResponse.append("Коллекция очищена");
+	public void execute(Context context, SessionServerClient session) {
+		context.collectionManager.getCollection().clear();
+		session.append("Коллекция очищена");
 	}
 	
 	@Override

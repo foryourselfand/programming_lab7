@@ -1,6 +1,7 @@
 package Commands;
 
 import Errors.CollectionIsEmptyError;
+import Session.SessionServerClient;
 import Utils.Context;
 
 /**
@@ -12,9 +13,9 @@ public abstract class CommandWithNotEmptyCollection extends Command {
 	}
 	
 	@Override
-	public void showDescriptionAndExecute(Context context) {
+	public void showDescriptionAndExecute(Context context, SessionServerClient session) {
 		this.validateCollectionSize(context);
-		super.showDescriptionAndExecute(context);
+		super.showDescriptionAndExecute(context, session);
 	}
 	
 	public void validateCollectionSize(Context context) {

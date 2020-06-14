@@ -1,6 +1,9 @@
 package Commands;
 
 
+import Session.SessionServerClient;
+import Utils.Context;
+
 /**
  * Команда вывода в стандартный поток всех элементов коллекции в строковом представлении
  */
@@ -10,8 +13,8 @@ public class CommandShow extends CommandWithNotEmptyCollection implements Comman
 	}
 	
 	@Override
-	public void execute() {
-		stringBuilderResponse.append(context.collectionManager.getCollectionSortedString());
+	public void execute(Context context, SessionServerClient session) {
+		session.append(context.collectionManager.getCollectionSortedString());
 	}
 	
 	@Override

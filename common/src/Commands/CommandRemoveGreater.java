@@ -1,13 +1,14 @@
 package Commands;
 
 import Input.Flat;
+import Session.SessionServerClient;
 import Utils.Context;
 import Utils.FlatCreator;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CommandRemoveGreater extends CommandWithNotEmptyCollection implements CommandAuthorized{
+public class CommandRemoveGreater extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	private Flat flatNew;
 	
 	public CommandRemoveGreater() {
@@ -20,13 +21,15 @@ public class CommandRemoveGreater extends CommandWithNotEmptyCollection implemen
 	}
 	
 	@Override
-	public void execute() {
-		int collectionSizeStart = this.context.collectionManager.getCollectionSize();
+	public void execute(Context context, SessionServerClient session) {
+		session.append("Созданный элемент для сравнения ").append(flatNew.toString());
 		
-		this.context.collectionManager.getCollection().removeIf(flat->flat.compareTo(flatNew) < 0);
+		int collectionSizeStart = context.collectionManager.getCollectionSize();
+		
+		context.collectionManager.getCollection().removeIf(flat->flat.compareTo(flatNew) < 0);
 		Context.idGenerator.getIds().removeIf(id->flatNew.getId().equals(id));
 		
-		int collectionSizeEnd = this.context.collectionManager.getCollectionSize();
+		int collectionSizeEnd = context.collectionManager.getCollectionSize();
 		boolean isCollectionSizeChanged = collectionSizeEnd != collectionSizeStart;
 		
 		if (isCollectionSizeChanged) {
@@ -35,16 +38,14 @@ public class CommandRemoveGreater extends CommandWithNotEmptyCollection implemen
 					.map(Flat::getId)
 					.sorted()
 					.collect(Collectors.toList());
-			stringBuilderResponse.append("Удаленные элементы").append(idsGreater.toString()).append("\n");
+			session.append("Удаленные элементы").append(idsGreater.toString()).append("\n");
 		} else {
-			stringBuilderResponse.append("В коллекции нет элементов превышающих заданный").append("\n");
+			session.append("В коллекции нет элементов превышающих заданный").append("\n");
 		}
 	}
 	
 	private Flat getCreatedFlat() {
-		Flat createdFlat = FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
-		stringBuilderResponse.append("Созданный элемент для сравнения ").append(createdFlat.toString());
-		return createdFlat;
+		return FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
 	}
 	
 	@Override

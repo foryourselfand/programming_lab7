@@ -5,6 +5,7 @@ import Expectations.ExpectedFile.ExpectedFileExist;
 import Expectations.ExpectedFile.ExpectedFileReadable;
 import Expectations.ExpectedFile.ExpectedFileRegular;
 import Expectations.ExpectedFile.ExpectedFileWritable;
+import Session.SessionServerClient;
 import SourseReaders.SourceReaderFile;
 import Utils.Context;
 
@@ -34,8 +35,7 @@ public class CommandExecuteScript extends Command {
 	}
 	
 	@Override
-	public void execute() {
-	
+	public void execute(Context context, SessionServerClient session) {
 	}
 	
 	@Override

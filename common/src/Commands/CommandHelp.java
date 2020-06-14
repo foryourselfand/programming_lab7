@@ -1,11 +1,12 @@
 package Commands;
 
-import Session.User;
+import Session.SessionServerClient;
+import Utils.Context;
 
 import java.util.Iterator;
 
 /**
- * Команда вывода справки по доступным коммандам
+ * Команда вывода справки по доступным командам
  */
 public class CommandHelp extends Command {
 	public CommandHelp() {
@@ -13,10 +14,11 @@ public class CommandHelp extends Command {
 	}
 	
 	@Override
-	public void execute() {
-		Iterator<Command> commands = this.context.commandsHolder.getCommands();
-		commands.forEachRemaining(command->stringBuilderResponse.append(command.getFullInformation()).append("\n"));
+	public void execute(Context context, SessionServerClient session) {
+		Iterator<Command> commands = context.commandsHolder.getCommands();
+		commands.forEachRemaining(command->session.append(command.getFullInformation()).append("\n"));
 	}
+	
 	
 	@Override
 	public String getName() {

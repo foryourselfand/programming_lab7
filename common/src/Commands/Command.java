@@ -3,8 +3,8 @@ package Commands;
 import Errors.WrongArgumentErrors.WrongArgumentLengthError;
 import Errors.WrongArgumentErrors.WrongArgumentLengthFullError;
 import Expectations.Argument;
+import Session.SessionServerClient;
 import Session.User;
-import Utils.CommandsHistoryManager;
 import Utils.Context;
 
 import java.io.Serializable;
@@ -15,26 +15,14 @@ public abstract class Command implements Serializable {
 	private final List<Argument> arguments;
 	private final int argumentsLength;
 	
-	protected Context context;
-	protected CommandsHistoryManager commandsHistoryManager;
 	protected String[] commandArguments;
-	protected StringBuilder stringBuilderResponse;
 	
 	
 	public Command() {
-		stringBuilderResponse = new StringBuilder();
 		arguments = new ArrayList<>();
 		addArgumentValidators(this.arguments);
 		
 		this.argumentsLength = this.arguments.size();
-	}
-	
-	public CommandsHistoryManager getCommandsHistoryManager() {
-		return commandsHistoryManager;
-	}
-	
-	public void setCommandsHistoryManager(CommandsHistoryManager commandsHistoryManager) {
-		this.commandsHistoryManager = commandsHistoryManager;
 	}
 	
 	public void validateArguments(String[] commandArguments) {
@@ -54,19 +42,17 @@ public abstract class Command implements Serializable {
 		this.commandArguments = commandArguments;
 	}
 	
-	public void showDescriptionAndExecute(Context context) {
-		this.context = context;
-		
+	public void showDescriptionAndExecute(Context context, SessionServerClient session) {
 		for (int i = 0; i < commandArguments.length; i++)
 			this.arguments.get(i).checkArgumentOnServer(commandArguments[i]);
 		
-		showDescription();
+		showDescription(session);
 		
-		this.execute();
+		this.execute(context, session);
 	}
 	
-	public void showDescription() {
-		stringBuilderResponse.append(getDescription()).append("\n");
+	public void showDescription(SessionServerClient session) {
+		session.append(getDescription()).append("\n");
 	}
 	
 	
@@ -77,7 +63,7 @@ public abstract class Command implements Serializable {
 		return null;
 	}
 	
-	public abstract void execute();
+	public abstract void execute(Context context, SessionServerClient session);
 	
 	public String getArgumentsDescription() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -112,11 +98,5 @@ public abstract class Command implements Serializable {
 	public abstract String getDescription();
 	
 	protected void addArgumentValidators(List<Argument> arguments) {
-	}
-	
-	public String getResponse() {
-		String response = stringBuilderResponse.toString();
-		stringBuilderResponse = new StringBuilder();
-		return response;
 	}
 }

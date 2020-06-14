@@ -1,5 +1,6 @@
 package Commands;
 
+import Session.SessionServerClient;
 import Utils.CommandsHistoryManager;
 import Utils.Context;
 
@@ -14,10 +15,10 @@ public class CommandHistory extends Command {
 	}
 	
 	@Override
-	public void execute() {
-		Iterator<String> commandHistory = commandsHistoryManager.getCommandsHistory();
-		stringBuilderResponse.append(String.format("Последние %d команд (без их аргументов):\n", CommandsHistoryManager.HISTORY_SIZE));
-		commandHistory.forEachRemaining(commandName->stringBuilderResponse.append(commandName).append("\n"));
+	public void execute(Context context, SessionServerClient session) {
+		Iterator<String> commandHistory = session.getCommandsHistoryManager().getCommandsHistory();
+		session.append(String.format("Последние %d команд (без их аргументов):\n", CommandsHistoryManager.HISTORY_SIZE));
+		commandHistory.forEachRemaining(commandName->session.append(commandName).append("\n"));
 	}
 	
 	@Override

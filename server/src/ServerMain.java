@@ -25,6 +25,6 @@ public class ServerMain {
 		} catch (InputError inputError) {
 			logger.log(Level.SEVERE, "Error while trying initialize server", inputError);
 		}
-		Server.readRequests(context);
+		Server.run(context);
 	}
 }

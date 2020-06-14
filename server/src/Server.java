@@ -22,6 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
+	public static final int nThreadFixed = 10;
+	public static final int nThreadCached = 10;
 	public static final Logger logger = Logger.getLogger(Server.class.getName());
 	
 	private static final int DEFAULT_BUFFER_SIZE = 65536;
@@ -49,28 +51,43 @@ public class Server {
 		Runtime.getRuntime().addShutdownHook(new Thread(()->logger.info("Сервер закончил работу")));
 	}
 	
-	public static void readRequests(Context context) {
+	public static void run(Context context) {
 		try {
-			Callable<SocketAddress> callableRequestReader = new CallableRequestReader();
-			ExecutorService executorServiceRequestReader = Executors.newFixedThreadPool(10);
-			while (true) {
-				Future<SocketAddress> addressFuture = executorServiceRequestReader.submit(callableRequestReader);
-				address = addressFuture.get();
-				byte[] copyData = new byte[buffer.length];
-				System.arraycopy(buffer, 0, copyData, 0, buffer.length);
-				
-				Callable<String> callableRequestProceed = new CallableRequestProceed(context, copyData);
-				ExecutorService executorServiceRequestProceed = Executors.newCachedThreadPool();
-				Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
-				String response = responseFuture.get();
-				
-				Callable<Void> callableRequestSender = new CallableRequestSender(response, context.commandsHistoryManager);
-				ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
-				executorServiceRequestSender.submit(callableRequestSender);
-			}
+			readRequest(context);
 		} catch (ClassCastException | InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static void readRequest(Context context) throws InterruptedException, ExecutionException {
+		Callable<SocketAddress> callableRequestReader = new CallableRequestReader();
+		ExecutorService executorServiceRequestReader = Executors.newFixedThreadPool(nThreadFixed);
+		while (true) {
+			Future<SocketAddress> addressFuture = executorServiceRequestReader.submit(callableRequestReader);
+			address = addressFuture.get();
+			byte[] copyData = new byte[buffer.length];
+			System.arraycopy(buffer, 0, copyData, 0, buffer.length);
+			
+			proceedRequest(context, copyData);
+		}
+	}
+	
+	private static void proceedRequest(Context context, byte[] copyData) throws InterruptedException, ExecutionException {
+		Callable<String> callableRequestProceed = new CallableRequestProceed(context, copyData);
+		ExecutorService executorServiceRequestProceed = Executors.newCachedThreadPool();
+		for (int i = 0; i < nThreadCached; i++) {
+			Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
+			String response = responseFuture.get();
+			
+			sendResponse(context, response);
+		}
+	}
+	
+	private static void sendResponse(Context context, String response) {
+		Callable<Void> callableRequestSender = new CallableRequestSender(response, context.commandsHistoryManager);
+		ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
+		for (int j = 0; j < 42; j++)
+			executorServiceRequestSender.submit(callableRequestSender);
 	}
 	
 	public static String processCommand(Context context, Command command, User user) {

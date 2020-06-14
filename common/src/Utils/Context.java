@@ -18,7 +18,6 @@ public class Context {
 	public CommandsHolder commandsHolder;
 	public CollectionManager collectionManager;
 	public CSVSaver csvSaver;
-	public CommandsHistoryManager commandsHistoryManager;
 	
 	public Context() {
 		this.collectionManager = new CollectionManager();
@@ -42,9 +41,5 @@ public class Context {
 		} catch (InputError inputError) {
 			logger.log(Level.SEVERE, "Error while trying to load deque from csv file", inputError);
 		}
-	}
-	
-	public void setCommandsHistoryManager(CommandsHistoryManager commandsHistoryManager) {
-		this.commandsHistoryManager = commandsHistoryManager;
 	}
 }

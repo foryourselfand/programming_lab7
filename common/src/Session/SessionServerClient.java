@@ -5,12 +5,12 @@ import Utils.CommandsHistoryManager;
 import java.io.Serializable;
 
 public class SessionServerClient implements Serializable {
-	private String message;
 	private CommandsHistoryManager commandsHistoryManager;
+	private String message;
 	
-	public SessionServerClient(String message, CommandsHistoryManager commandsHistoryManager) {
-		this.message = message;
+	public SessionServerClient(CommandsHistoryManager commandsHistoryManager, String message) {
 		this.commandsHistoryManager = commandsHistoryManager;
+		this.message = message;
 	}
 	
 	public String getMessage() {

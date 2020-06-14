@@ -72,24 +72,24 @@ public class Server {
 	}
 	
 	private static void proceedRequest(Context context, byte[] copyData) throws InterruptedException, ExecutionException {
-		Callable<String> callableRequestProceed = new CallableRequestProceed(context, copyData);
+		Callable<SessionServerClient> callableRequestProceed = new CallableRequestProceed(context, copyData);
 		ExecutorService executorServiceRequestProceed = Executors.newCachedThreadPool();
 		
-		Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
-		String response = responseFuture.get();
+		Future<SessionServerClient> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
+		SessionServerClient session = responseFuture.get();
 		
-		sendResponse(context, response);
+		sendResponse(context, session);
 		
 	}
 	
-	private static void sendResponse(Context context, String response) {
-		Callable<Void> callableRequestSender = new CallableRequestSender(response, context.commandsHistoryManager);
+	private static void sendResponse(Context context, SessionServerClient session) {
+		Callable<Void> callableRequestSender = new CallableRequestSender(session);
 		ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
 		
 		executorServiceRequestSender.submit(callableRequestSender);
 	}
 	
-	public static String processCommand(Context context, Command command, User user) {
+	public static String processCommand(Context context, Command command, User user, CommandsHistoryManager commandsHistoryManager) {
 		if (command instanceof CommandExit) {
 			try {
 				Command commandSave = new CommandSave();
@@ -105,8 +105,9 @@ public class Server {
 		}
 		
 		try {
+			command.setCommandsHistoryManager(commandsHistoryManager);
 			command.showDescriptionAndExecute(context);
-			context.commandsHistoryManager.addCommandToHistory(command);
+			commandsHistoryManager.addCommandToHistory(command);
 			return command.getResponse();
 		} catch (InputError inputError) {
 			return inputError.getMessage() + "\n";
@@ -125,7 +126,7 @@ public class Server {
 		}
 	}
 	
-	static class CallableRequestProceed implements Callable<String> {
+	static class CallableRequestProceed implements Callable<SessionServerClient> {
 		private final Context context;
 		private final byte[] copyData;
 		
@@ -135,32 +136,29 @@ public class Server {
 		}
 		
 		@Override
-		public String call() throws IOException, ClassNotFoundException {
+		public SessionServerClient call() throws IOException, ClassNotFoundException {
 			SessionClientServer sessionClientServer = sessionClientServerSerializationManager.readObject(copyData);
 			Command commandReceived = sessionClientServer.getCommand();
 			User userReceived = sessionClientServer.getUser();
 			CommandsHistoryManager commandsHistoryManagerReceived = sessionClientServer.getCommandsHistoryManager();
-			context.setCommandsHistoryManager(commandsHistoryManagerReceived);
+			
 			logger.log(Level.INFO, "Server receive command" + commandReceived);
-			String response = processCommand(context, commandReceived, userReceived);
+			String response = processCommand(context, commandReceived, userReceived, commandsHistoryManagerReceived);
 			logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
-			return response;
+			return new SessionServerClient(commandsHistoryManagerReceived, response);
 		}
 	}
 	
 	static class CallableRequestSender implements Callable<Void> {
-		private final String response;
-		private final CommandsHistoryManager commandsHistoryManager;
+		private final SessionServerClient session;
 		
-		public CallableRequestSender(String response, CommandsHistoryManager commandsHistoryManager) {
-			this.response = response;
-			this.commandsHistoryManager = commandsHistoryManager;
+		public CallableRequestSender(SessionServerClient session) {
+			this.session = session;
 		}
 		
 		@Override
 		public Void call() throws IOException {
-			SessionServerClient sessionServerClient = new SessionServerClient(response, commandsHistoryManager);
-			byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(sessionServerClient);
+			byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(session);
 			ByteBuffer byteBuffer = ByteBuffer.wrap(sessionBytes);
 			channel.send(byteBuffer, address);
 			return null;

@@ -4,6 +4,7 @@ import Errors.WrongArgumentErrors.WrongArgumentLengthError;
 import Errors.WrongArgumentErrors.WrongArgumentLengthFullError;
 import Expectations.Argument;
 import Session.User;
+import Utils.CommandsHistoryManager;
 import Utils.Context;
 
 import java.io.Serializable;
@@ -15,8 +16,10 @@ public abstract class Command implements Serializable {
 	private final int argumentsLength;
 	
 	protected Context context;
+	protected CommandsHistoryManager commandsHistoryManager;
 	protected String[] commandArguments;
 	protected StringBuilder stringBuilderResponse;
+	
 	
 	public Command() {
 		stringBuilderResponse = new StringBuilder();
@@ -24,6 +27,14 @@ public abstract class Command implements Serializable {
 		addArgumentValidators(this.arguments);
 		
 		this.argumentsLength = this.arguments.size();
+	}
+	
+	public CommandsHistoryManager getCommandsHistoryManager() {
+		return commandsHistoryManager;
+	}
+	
+	public void setCommandsHistoryManager(CommandsHistoryManager commandsHistoryManager) {
+		this.commandsHistoryManager = commandsHistoryManager;
 	}
 	
 	public void validateArguments(String[] commandArguments) {

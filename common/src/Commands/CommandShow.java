@@ -4,7 +4,7 @@ package Commands;
 /**
  * Команда вывода в стандартный поток всех элементов коллекции в строковом представлении
  */
-public class CommandShow extends CommandWithNotEmptyCollection {
+public class CommandShow extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	public CommandShow() {
 		super();
 	}

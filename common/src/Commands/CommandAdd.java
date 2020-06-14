@@ -4,7 +4,7 @@ import Input.Flat;
 import Utils.Context;
 import Utils.FlatCreator;
 
-public class CommandAdd extends Command {
+public class CommandAdd extends Command implements CommandAuthorized {
 	private Flat flatNew;
 	
 	public CommandAdd() {

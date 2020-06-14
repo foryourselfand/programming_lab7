@@ -3,6 +3,7 @@ package Commands;
 import Errors.WrongArgumentErrors.WrongArgumentLengthError;
 import Errors.WrongArgumentErrors.WrongArgumentLengthFullError;
 import Expectations.Argument;
+import Session.User;
 import Utils.Context;
 
 import java.io.Serializable;
@@ -57,7 +58,12 @@ public abstract class Command implements Serializable {
 		stringBuilderResponse.append(getDescription()).append("\n");
 	}
 	
+	
 	public void preExecute() {
+	}
+	
+	public User getUser() {
+		return null;
 	}
 	
 	public abstract void execute();

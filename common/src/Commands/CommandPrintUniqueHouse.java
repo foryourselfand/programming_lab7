@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Команда вывода уникальных значений поля дом
  */
-public class CommandPrintUniqueHouse extends CommandWithNotEmptyCollection {
+public class CommandPrintUniqueHouse extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	public CommandPrintUniqueHouse() {
 		super();
 	}

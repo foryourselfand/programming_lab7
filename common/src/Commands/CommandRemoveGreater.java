@@ -7,7 +7,7 @@ import Utils.FlatCreator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CommandRemoveGreater extends CommandWithNotEmptyCollection {
+public class CommandRemoveGreater extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	private Flat flatNew;
 	
 	public CommandRemoveGreater() {

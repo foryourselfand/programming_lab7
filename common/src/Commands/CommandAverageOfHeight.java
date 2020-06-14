@@ -2,7 +2,7 @@ package Commands;
 
 import Input.Flat;
 
-public class CommandAverageOfHeight extends CommandWithNotEmptyCollection {
+public class CommandAverageOfHeight extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	public CommandAverageOfHeight() {
 		super();
 	}

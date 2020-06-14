@@ -1,6 +1,6 @@
 package Commands;
 
-public class CommandClear extends CommandWithNotEmptyCollection {
+public class CommandClear extends CommandWithNotEmptyCollection implements CommandAuthorized {
 	public CommandClear() {
 		super();
 	}

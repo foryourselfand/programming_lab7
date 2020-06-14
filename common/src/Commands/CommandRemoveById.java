@@ -6,7 +6,7 @@ import Expectations.ExpectedType.ExpectedLong;
 
 import java.util.List;
 
-public class CommandRemoveById extends CommandWithNotEmptyCollection {
+public class CommandRemoveById extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	public CommandRemoveById() {
 		super();
 	}

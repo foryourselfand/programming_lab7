@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 
-public class CommandGroupCountingByArea extends CommandWithNotEmptyCollection {
+public class CommandGroupCountingByArea extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	public CommandGroupCountingByArea() {
 		super();
 	}

@@ -26,10 +26,9 @@ public class CommandsSender {
 			
 			commandToExecute.validateArguments(commandArguments);
 			commandToExecute.preExecute();
+			Client.setUserIfNotNull(commandToExecute.getUser());
 			
-			Client.sessionClientServer.setCommand(commandToExecute);
-			
-			Client.sendSessionAndReceiveAnswer();
+			Client.sendSessionAndReceiveAnswer(commandToExecute);
 		} catch (InputError error) {
 			System.out.println(error.getMessage());
 		}

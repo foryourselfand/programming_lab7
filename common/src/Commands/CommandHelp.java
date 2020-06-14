@@ -1,5 +1,7 @@
 package Commands;
 
+import Session.User;
+
 import java.util.Iterator;
 
 /**
@@ -10,6 +12,10 @@ public class CommandHelp extends Command {
 		super();
 	}
 	
+	@Override
+	public User getUser() {
+		return new User("login1", "password1", "salt1");
+	}
 	
 	@Override
 	public void execute() {

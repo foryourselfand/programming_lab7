@@ -9,7 +9,7 @@ import Utils.FlatCreator;
 
 import java.util.List;
 
-public class CommandUpdateById extends CommandWithNotEmptyCollection {
+public class CommandUpdateById extends CommandWithNotEmptyCollection implements CommandAuthorized{
 	private Flat flatNew;
 	
 	public CommandUpdateById() {

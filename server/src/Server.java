@@ -1,10 +1,12 @@
 import Commands.Command;
+import Commands.CommandAuthorized;
 import Commands.CommandExit;
 import Commands.CommandSave;
 import Errors.ConnectionError;
 import Errors.InputErrors.InputError;
 import Session.SessionClientServer;
 import Session.SessionServerClient;
+import Session.User;
 import Utils.CommandsHistoryManager;
 import Utils.Context;
 import Utils.SerializationManager;
@@ -55,15 +57,17 @@ public class Server {
 				SessionClientServer sessionClientServer = sessionClientServerSerializationManager.readObject(buffer);
 				
 				Command commandReceived = sessionClientServer.getCommand();
-				CommandsHistoryManager commandsHistoryManager = sessionClientServer.getCommandsHistoryManager();
-				context.setCommandsHistoryManager(commandsHistoryManager);
+				User userReceived = sessionClientServer.getUser();
+				CommandsHistoryManager commandsHistoryManagerReceived = sessionClientServer.getCommandsHistoryManager();
+				
+				context.setCommandsHistoryManager(commandsHistoryManagerReceived);
 				logger.log(Level.INFO, "Server receive command" + commandReceived);
 				
-				String response = processCommand(context, commandReceived);
+				String response = processCommand(context, commandReceived, userReceived);
 				
 				logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
 				
-				SessionServerClient sessionServerClient = new SessionServerClient(response, commandsHistoryManager);
+				SessionServerClient sessionServerClient = new SessionServerClient(response, context.commandsHistoryManager);
 				
 				byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(sessionServerClient);
 				byteBuffer = ByteBuffer.wrap(sessionBytes);
@@ -74,7 +78,7 @@ public class Server {
 		}
 	}
 	
-	public static String processCommand(Context context, Command command) {
+	public static String processCommand(Context context, Command command, User user) {
 		if (command instanceof CommandExit) {
 			try {
 				Command commandSave = new CommandSave();
@@ -83,6 +87,10 @@ public class Server {
 			} catch (InputError ignored) {
 			}
 			return command.getDescription();
+		}
+		
+		if (command instanceof CommandAuthorized) {
+			System.out.println(user);
 		}
 		
 		try {

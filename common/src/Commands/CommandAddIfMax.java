@@ -4,7 +4,7 @@ import Input.Flat;
 import Utils.Context;
 import Utils.FlatCreator;
 
-public class CommandAddIfMax extends Command {
+public class CommandAddIfMax extends Command implements CommandAuthorized {
 	private Flat flatNew;
 	
 	@Override

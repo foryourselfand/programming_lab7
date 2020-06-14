@@ -1,6 +1,6 @@
 import Commands.Command;
-import Commands.CommandExit;
 import Errors.InputErrors.InputError;
+import Session.SessionClientServer;
 import Utils.CommandsHolder;
 
 import java.util.Arrays;
@@ -27,7 +27,9 @@ public class CommandsSender {
 			commandToExecute.validateArguments(commandArguments);
 			commandToExecute.preExecute();
 			
-			Client.sendCommandAndReceiveAnswer(commandToExecute);
+			Client.sessionClientServer.setCommand(commandToExecute);
+			
+			Client.sendSessionAndReceiveAnswer();
 		} catch (InputError error) {
 			System.out.println(error.getMessage());
 		}

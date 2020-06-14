@@ -1,4 +1,5 @@
 import Errors.InputErrors.InputError;
+import Utils.CommandsHistoryManager;
 import Utils.CommandsHolder;
 import Utils.Context;
 
@@ -14,6 +15,10 @@ public class ClientMain {
 		} catch (InputError inputError) {
 			System.out.println(inputError.getMessage());
 		}
+		
+		CommandsHistoryManager commandsHistoryManager = new CommandsHistoryManager();
+		
+		Client.sessionClientServer.setCommandsHistoryManager(commandsHistoryManager);
 		
 		CommandsHolder commandsHolder = new CommandsHolder();
 		CommandsSender commandsSender = new CommandsSender(commandsHolder);

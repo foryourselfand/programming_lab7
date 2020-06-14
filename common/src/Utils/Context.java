@@ -13,18 +13,16 @@ public class Context {
 	public static final Logger logger = Logger.getLogger(Context.class.getName());
 	
 	public static final LocalDate INITIALIZATION_DATE = CreationDateGenerator.generateCreationDate();
-	public static final int HISTORY_SIZE = 12;
 	public static final IdGenerator idGenerator = new IdGenerator();
 	public static LineReader lineReader = new LineReader();
 	public CommandsHolder commandsHolder;
-	public CommandsHistoryManager commandsHistoryManager;
 	public CollectionManager collectionManager;
 	public CSVSaver csvSaver;
+	public CommandsHistoryManager commandsHistoryManager;
 	
 	public Context() {
 		this.collectionManager = new CollectionManager();
 		this.commandsHolder = new CommandsHolder();
-		this.commandsHistoryManager = new CommandsHistoryManager();
 		this.csvSaver = new CSVSaver();
 	}
 	
@@ -44,5 +42,9 @@ public class Context {
 		} catch (InputError inputError) {
 			logger.log(Level.SEVERE, "Error while trying to load deque from csv file", inputError);
 		}
+	}
+	
+	public void setCommandsHistoryManager(CommandsHistoryManager commandsHistoryManager) {
+		this.commandsHistoryManager = commandsHistoryManager;
 	}
 }

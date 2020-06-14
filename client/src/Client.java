@@ -1,18 +1,20 @@
-import Commands.Command;
 import Commands.CommandExit;
 import Errors.ConnectionError;
 import Errors.TimeoutError;
-import Utils.Response;
+import Session.SessionClientServer;
+import Session.SessionServerClient;
+import Utils.CommandsHistoryManager;
 import Utils.SerializationManager;
 
 import java.io.IOException;
 import java.net.*;
 
 public class Client {
+	public static SessionClientServer sessionClientServer = new SessionClientServer();
 	private static final int DEFAULT_BUFFER_SIZE = 65536;
 	private static final int TIMEOUT = 5000;
-	private static final SerializationManager<Command> commandSerializationManager = new SerializationManager<>();
-	private static final SerializationManager<Response> responseSerializationManager = new SerializationManager<>();
+	private static final SerializationManager<SessionClientServer> sessionClientServerSerializationManager = new SerializationManager<>();
+	private static final SerializationManager<SessionServerClient> sessionServerClientSerializationManager = new SerializationManager<>();
 	private static SocketAddress socketAddress;
 	private static DatagramSocket datagramSocket;
 	
@@ -29,10 +31,10 @@ public class Client {
 		
 	}
 	
-	public static void sendCommandAndReceiveAnswer(Command command) {
+	public static void sendSessionAndReceiveAnswer() {
 		try {
-			byte[] commandInBytes = commandSerializationManager.writeObject(command);
-			DatagramPacket datagramPacket = new DatagramPacket(commandInBytes, commandInBytes.length, socketAddress);
+			byte[] sessionInBytes = sessionClientServerSerializationManager.writeObject(sessionClientServer);
+			DatagramPacket datagramPacket = new DatagramPacket(sessionInBytes, sessionInBytes.length, socketAddress);
 			datagramSocket.send(datagramPacket);
 			System.out.println("Запрос отправлен на сервер...");
 			byte[] answerInBytes = new byte[DEFAULT_BUFFER_SIZE];
@@ -44,12 +46,16 @@ public class Client {
 				throw new TimeoutError();
 			}
 			
-			String result = responseSerializationManager.readObject(answerInBytes).getResponse();
+			SessionServerClient sessionServerClient = sessionServerClientSerializationManager.readObject(answerInBytes);
+			String message = sessionServerClient.getMessage();
+			CommandsHistoryManager commandsHistoryManager = sessionServerClient.getCommandsHistoryManager();
 			System.out.println("Получен ответ от сервера: ");
-			System.out.print(result);
+			System.out.print(message);
 			
-			if (command instanceof CommandExit) {
-				command.execute();
+			sessionClientServer.setCommandsHistoryManager(commandsHistoryManager);
+			
+			if (sessionClientServer.getCommand() instanceof CommandExit) {
+				sessionClientServer.getCommand().execute();
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();

@@ -3,8 +3,10 @@ import Commands.CommandExit;
 import Commands.CommandSave;
 import Errors.ConnectionError;
 import Errors.InputErrors.InputError;
+import Session.SessionClientServer;
+import Session.SessionServerClient;
+import Utils.CommandsHistoryManager;
 import Utils.Context;
-import Utils.Response;
 import Utils.SerializationManager;
 import Utils.TempFileManager;
 
@@ -21,8 +23,10 @@ public class Server {
 	
 	private static final int DEFAULT_BUFFER_SIZE = 65536;
 	private static final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-	private static final SerializationManager<Command> commandSerializationManager = new SerializationManager<>();
-	private static final SerializationManager<Response> responseSerializationManager = new SerializationManager<>();
+	
+	private static final SerializationManager<SessionClientServer> sessionClientServerSerializationManager = new SerializationManager<>();
+	private static final SerializationManager<SessionServerClient> sessionServerClientSerializationManager = new SerializationManager<>();
+	
 	private static SocketAddress address;
 	private static DatagramChannel channel;
 	
@@ -48,16 +52,21 @@ public class Server {
 				do {
 					address = channel.receive(byteBuffer);
 				} while (address == null);
-				Command command = commandSerializationManager.readObject(buffer);
+				SessionClientServer sessionClientServer = sessionClientServerSerializationManager.readObject(buffer);
 				
-				logger.log(Level.INFO, "Server receive command" + command);
+				Command commandReceived = sessionClientServer.getCommand();
+				CommandsHistoryManager commandsHistoryManager = sessionClientServer.getCommandsHistoryManager();
+				context.setCommandsHistoryManager(commandsHistoryManager);
+				logger.log(Level.INFO, "Server receive command" + commandReceived);
 				
-				String response = processCommand(context, command);
+				String response = processCommand(context, commandReceived);
 				
-				logger.log(Level.INFO, "Command " + command + " executed, sending response to client");
+				logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
 				
-				byte[] answer = responseSerializationManager.writeObject(new Response(response));
-				byteBuffer = ByteBuffer.wrap(answer);
+				SessionServerClient sessionServerClient = new SessionServerClient(response, commandsHistoryManager);
+				
+				byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(sessionServerClient);
+				byteBuffer = ByteBuffer.wrap(sessionBytes);
 				channel.send(byteBuffer, address);
 			}
 		} catch (ClassNotFoundException | IOException | ClassCastException e) {

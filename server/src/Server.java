@@ -17,6 +17,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,35 +46,29 @@ public class Server {
 		}
 		
 		logger.info("Connection is established, listen port: " + port);
+		Runtime.getRuntime().addShutdownHook(new Thread(()->logger.info("Сервер закончил работу")));
 	}
 	
-	public static void run(Context context) {
+	public static void readRequests(Context context) {
 		try {
+			Callable<SocketAddress> callableRequestReader = new CallableRequestReader();
+			ExecutorService executorServiceRequestReader = Executors.newFixedThreadPool(10);
 			while (true) {
-				ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
-				do {
-					address = channel.receive(byteBuffer);
-				} while (address == null);
-				SessionClientServer sessionClientServer = sessionClientServerSerializationManager.readObject(buffer);
+				Future<SocketAddress> addressFuture = executorServiceRequestReader.submit(callableRequestReader);
+				address = addressFuture.get();
+				byte[] copyData = new byte[buffer.length];
+				System.arraycopy(buffer, 0, copyData, 0, buffer.length);
 				
-				Command commandReceived = sessionClientServer.getCommand();
-				User userReceived = sessionClientServer.getUser();
-				CommandsHistoryManager commandsHistoryManagerReceived = sessionClientServer.getCommandsHistoryManager();
+				Callable<String> callableRequestProceed = new CallableRequestProceed(context, copyData);
+				ExecutorService executorServiceRequestProceed = Executors.newCachedThreadPool();
+				Future<String> responseFuture = executorServiceRequestProceed.submit(callableRequestProceed);
+				String response = responseFuture.get();
 				
-				context.setCommandsHistoryManager(commandsHistoryManagerReceived);
-				logger.log(Level.INFO, "Server receive command" + commandReceived);
-				
-				String response = processCommand(context, commandReceived, userReceived);
-				
-				logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
-				
-				SessionServerClient sessionServerClient = new SessionServerClient(response, context.commandsHistoryManager);
-				
-				byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(sessionServerClient);
-				byteBuffer = ByteBuffer.wrap(sessionBytes);
-				channel.send(byteBuffer, address);
+				Callable<Void> callableRequestSender = new CallableRequestSender(response, context.commandsHistoryManager);
+				ExecutorService executorServiceRequestSender = Executors.newCachedThreadPool();
+				executorServiceRequestSender.submit(callableRequestSender);
 			}
-		} catch (ClassNotFoundException | IOException | ClassCastException e) {
+		} catch (ClassCastException | InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
@@ -99,6 +94,60 @@ public class Server {
 			return command.getResponse();
 		} catch (InputError inputError) {
 			return inputError.getMessage() + "\n";
+		}
+	}
+	
+	static class CallableRequestReader implements Callable<SocketAddress> {
+		@Override
+		public SocketAddress call() throws IOException {
+			ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+			SocketAddress socketAddress;
+			do {
+				socketAddress = channel.receive(byteBuffer);
+			} while (socketAddress == null);
+			return socketAddress;
+		}
+	}
+	
+	static class CallableRequestProceed implements Callable<String> {
+		private final Context context;
+		private final byte[] copyData;
+		
+		public CallableRequestProceed(Context context, byte[] copyData) {
+			this.context = context;
+			this.copyData = copyData;
+		}
+		
+		@Override
+		public String call() throws IOException, ClassNotFoundException {
+			SessionClientServer sessionClientServer = sessionClientServerSerializationManager.readObject(copyData);
+			Command commandReceived = sessionClientServer.getCommand();
+			User userReceived = sessionClientServer.getUser();
+			CommandsHistoryManager commandsHistoryManagerReceived = sessionClientServer.getCommandsHistoryManager();
+			context.setCommandsHistoryManager(commandsHistoryManagerReceived);
+			logger.log(Level.INFO, "Server receive command" + commandReceived);
+			String response = processCommand(context, commandReceived, userReceived);
+			logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
+			return response;
+		}
+	}
+	
+	static class CallableRequestSender implements Callable<Void> {
+		private final String response;
+		private final CommandsHistoryManager commandsHistoryManager;
+		
+		public CallableRequestSender(String response, CommandsHistoryManager commandsHistoryManager) {
+			this.response = response;
+			this.commandsHistoryManager = commandsHistoryManager;
+		}
+		
+		@Override
+		public Void call() throws IOException {
+			SessionServerClient sessionServerClient = new SessionServerClient(response, commandsHistoryManager);
+			byte[] sessionBytes = sessionServerClientSerializationManager.writeObject(sessionServerClient);
+			ByteBuffer byteBuffer = ByteBuffer.wrap(sessionBytes);
+			channel.send(byteBuffer, address);
+			return null;
 		}
 	}
 }

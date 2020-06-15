@@ -18,9 +18,10 @@ public class Context {
 	public DataBaseManager dataBaseManager;
 	
 	public Context() {
-		this.collectionManager = new CollectionManager();
+		this.dataBaseManager = new DataBaseManager(new UrlGetterSsh(), new CredentialsGetterRaw());
+		this.collectionManager = new CollectionManager(dataBaseManager);
 		this.commandsHolder = new CommandsHolder();
 		this.csvSaver = new CSVSaver();
-		this.dataBaseManager = new DataBaseManager(new UrlGetterSsh(), new CredentialsGetterRaw());
+		
 	}
 }

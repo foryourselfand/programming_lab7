@@ -1,7 +1,6 @@
 package Input;
 
 import Generators.CreationDateGenerator;
-import Generators.IdGenerator;
 import SourseReaders.SourceReader;
 import Utils.Context;
 import Utils.LineReader;
@@ -27,6 +26,22 @@ public class Flat implements Comparable<Flat>, Serializable {
 	private Boolean isNew; //Поле может быть null
 	private Transport transport; //Поле не может быть null
 	private House house; //Поле не может быть null
+	
+	public Flat() {
+	}
+	
+	public Flat(Long id, String flatName, Coordinates coordinates, LocalDate creationDate, int area, int numberOfRooms, Integer height, Boolean isNew, Transport transport, House house) {
+		this.id = id;
+		this.flatName = flatName;
+		this.coordinates = coordinates;
+		this.creationDate = creationDate;
+		this.area = area;
+		this.numberOfRooms = numberOfRooms;
+		this.height = height;
+		this.isNew = isNew;
+		this.transport = transport;
+		this.house = house;
+	}
 	
 	@Override
 	public String toString() {

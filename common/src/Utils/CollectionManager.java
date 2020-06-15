@@ -1,23 +1,24 @@
 package Utils;
 
+import DataBase.DataBaseManager;
 import Input.Flat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class CollectionManager {
-	private final LinkedHashSet<Flat> collection;
-	
+	private final CopyOnWriteArraySet<Flat> collection;
 	private LocalDate initializationDate;
 	
-	public CollectionManager() {
-		this.collection = new LinkedHashSet<>();
+	public CollectionManager(DataBaseManager dataBaseManager) {
+		this.collection = dataBaseManager.getCollectionFromDatabase();
 		this.initializationDate = Context.INITIALIZATION_DATE;
 	}
 	
-	public LinkedHashSet<Flat> getCollection() {
+	public CopyOnWriteArraySet<Flat> getCollection() {
 		return collection;
 	}
 	

@@ -2,12 +2,18 @@ package DataBase;
 
 import DataBase.CredentialsGetter.CredentialsGetter;
 import DataBase.UrlGetter.UrlGetter;
+import Input.Coordinates;
+import Input.Flat;
+import Input.House;
+import Input.Transport;
 import Session.User;
 import Utils.Characters;
 import Utils.PasswordEncoder;
 import Utils.RandomSequenceGenerator;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,5 +92,44 @@ public class DataBaseManager {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public CopyOnWriteArraySet<Flat> getCollectionFromDatabase() {
+		CopyOnWriteArraySet<Flat> collection = new CopyOnWriteArraySet<>();
+		
+		try {
+			PreparedStatement statement = connection.prepareStatement("select * from flats");
+			ResultSet resultSet = statement.executeQuery();
+			
+			while (resultSet.next()) {
+				Long id = resultSet.getLong("id");
+				String flatName = resultSet.getString("flatName");
+				
+				float x = resultSet.getFloat("x");
+				Double y = resultSet.getDouble("y");
+				Coordinates coordinates = new Coordinates(x, y);
+				
+				LocalDate creationDate = resultSet.getDate("creationDate").toLocalDate();
+				int area = resultSet.getInt("area");
+				int numberOfRooms = resultSet.getInt("numberOfRooms");
+				Integer height = resultSet.getInt("height");
+				Boolean isNew = resultSet.getBoolean("isNew");
+				Transport transport = Transport.valueOf(resultSet.getString("transport"));
+				
+				String houseName = resultSet.getString("houseName");
+				Integer year = resultSet.getInt("year");
+				Long numberOfFloors = resultSet.getLong("numberOfFloors");
+				long numberOfLifts = resultSet.getLong("numberOfLifts");
+				House house = new House(houseName, year, numberOfFloors, numberOfLifts);
+				
+				Flat flat = new Flat(id, flatName, coordinates, creationDate, area, numberOfRooms, height, isNew, transport, house);
+				
+				collection.add(flat);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return collection;
 	}
 }

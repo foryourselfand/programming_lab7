@@ -6,6 +6,14 @@ public class Coordinates implements Serializable {
 	private float x; //Значение поля должно быть больше -292
 	private Double y; //Значение поля должно быть больше -747, Поле не может быть null
 	
+	public Coordinates() {
+	}
+	
+	public Coordinates(float x, Double y) {
+		this.x = x;
+		this.y = y;
+	}
+	
 	public float getX() {
 		return x;
 	}

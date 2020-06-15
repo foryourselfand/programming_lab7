@@ -7,5 +7,5 @@ public enum Transport implements Serializable {
 	NONE,
 	LITTLE,
 	NORMAL,
-	ENOUGH;
+	ENOUGH
 }

@@ -10,6 +10,9 @@ import Utils.SerializationManager;
 
 import java.io.IOException;
 import java.net.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Client {
 	private static final int DEFAULT_BUFFER_SIZE = 65536;

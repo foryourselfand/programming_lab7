@@ -1,6 +1,8 @@
 import Commands.Command;
 import Commands.CommandAuthorized;
 import Commands.CommandExit;
+import Errors.AuthorizationErrors.NotAuthorizedError;
+import Errors.AuthorizationErrors.WrongUserNameOfPasswordError;
 import Errors.ConnectionError;
 import Errors.InputErrors.InputError;
 import Session.SessionClientServer;
@@ -91,16 +93,12 @@ public class Server {
 			session.append(command.getDescription());
 		}
 		
-		if (command instanceof CommandAuthorized) {
-			System.out.println(session.getUser());
-		}
+		if (command instanceof CommandAuthorized)
+			if (! context.dataBaseManager.containsUser(session.getUser()))
+				throw new NotAuthorizedError();
 		
-		try {
-			command.showDescriptionAndExecute(context, session);
-			session.getCommandsHistoryManager().addCommandToHistory(command);
-		} catch (InputError inputError) {
-			session.append(inputError.getMessage()).append("\n");
-		}
+		command.showDescriptionAndExecute(context, session);
+		session.getCommandsHistoryManager().addCommandToHistory(command);
 	}
 	
 	static class CallableRequestReader implements Callable<SocketAddress> {
@@ -133,7 +131,13 @@ public class Server {
 			
 			logger.log(Level.INFO, "Server receive command" + commandReceived);
 			SessionServerClient sessionServerClient = new SessionServerClient(commandsHistoryManagerReceived, userReceived);
-			processCommand(context, commandReceived, sessionServerClient);
+			
+			try {
+				processCommand(context, commandReceived, sessionServerClient);
+			} catch (InputError inputError) {
+				sessionServerClient.append(inputError.getMessage()).append("\n");
+			}
+			
 			logger.log(Level.INFO, "Command " + commandReceived + " executed, sending response to client");
 			return sessionServerClient;
 		}

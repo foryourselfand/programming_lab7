@@ -7,10 +7,7 @@ import Utils.Characters;
 import Utils.PasswordEncoder;
 import Utils.RandomSequenceGenerator;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +36,18 @@ public class DataBaseManager {
 		}
 	}
 	
+	public boolean containsUserName(User user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("select * from users where username = ?");
+			statement.setString(1, user.getUsername());
+			ResultSet resultSet = statement.executeQuery();
+			return resultSet.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public void addUser(User user) {
 		String salt = RandomSequenceGenerator.getRandomSequence(
 				10,
@@ -57,6 +66,25 @@ public class DataBaseManager {
 			statement.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public boolean containsUser(User user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("select * from users where username = ?");
+			statement.setString(1, user.getUsername());
+			ResultSet resultSet = statement.executeQuery();
+			if (! resultSet.next()) return false;
+			String salt = resultSet.getString("salt");
+			String hash = PasswordEncoder.getHash(user.getPassword(), salt);
+			statement = connection.prepareStatement("select * from users where username = ? and password = ? and salt = ?");
+			statement.setString(1, user.getUsername());
+			statement.setString(2, hash);
+			statement.setString(3, salt);
+			return statement.executeQuery().next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 }

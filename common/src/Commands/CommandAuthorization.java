@@ -10,7 +10,7 @@ import Utils.Characters;
 import java.util.List;
 
 public abstract class CommandAuthorization extends Command {
-	protected User user;
+	private User user;
 	
 	@Override
 	protected void addArgumentValidators(List<Argument> arguments) {

@@ -6,6 +6,7 @@ import Input.Coordinates;
 import Input.Flat;
 import Input.House;
 import Input.Transport;
+import Session.SessionServerClient;
 import Session.User;
 import Utils.Characters;
 import Utils.PasswordEncoder;
@@ -69,7 +70,7 @@ public class DataBaseManager {
 			statement.setString(1, user.getUsername());
 			statement.setString(2, hash);
 			statement.setString(3, salt);
-			statement.execute();
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -103,6 +104,7 @@ public class DataBaseManager {
 			
 			while (resultSet.next()) {
 				Long id = resultSet.getLong("id");
+				String userName = resultSet.getString("userName");
 				String flatName = resultSet.getString("flatName");
 				
 				float x = resultSet.getFloat("x");
@@ -122,7 +124,7 @@ public class DataBaseManager {
 				long numberOfLifts = resultSet.getLong("numberOfLifts");
 				House house = new House(houseName, year, numberOfFloors, numberOfLifts);
 				
-				Flat flat = new Flat(id, flatName, coordinates, creationDate, area, numberOfRooms, height, isNew, transport, house);
+				Flat flat = new Flat(id, userName, flatName, coordinates, creationDate, area, numberOfRooms, height, isNew, transport, house);
 				
 				collection.add(flat);
 			}
@@ -131,5 +133,123 @@ public class DataBaseManager {
 		}
 		
 		return collection;
+	}
+	
+	public long generateId() {
+		try {
+			PreparedStatement statement = connection.prepareStatement("select nextval('generate_id')");
+			ResultSet resultSet = statement.executeQuery();
+			resultSet.next();
+			return resultSet.getLong("nextval");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public boolean addFlat(Flat flat, SessionServerClient session) {
+		try {
+			flat.setUserName(session.getUser().getUsername());
+			
+			PreparedStatement statement = connection.prepareStatement("insert into flats values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, cast (? as transport), ?, ?, ?, ?)");
+			
+			long id = generateId();
+			String userName = flat.getUserName();
+			String flatName = flat.getFlatName();
+			
+			Coordinates coordinates = flat.getCoordinates();
+			float x = coordinates.getX();
+			Double y = coordinates.getY();
+			
+			LocalDate creationDate = flat.getCreationDate();
+			int area = flat.getArea();
+			int numberOfRooms = flat.getNumberOfRooms();
+			Integer height = flat.getHeight();
+			Boolean isNew = flat.getIsNew();
+			Transport transport = flat.getTransport();
+			
+			House house = flat.getHouse();
+			String houseName = house.getHouseName();
+			Integer year = house.getYear();
+			Long numberOfFloors = house.getNumberOfFloors();
+			long numberOfLifts = house.getNumberOfLifts();
+			
+			statement.setLong(1, id);
+			statement.setString(2, userName);
+			statement.setString(3, flatName);
+			statement.setFloat(4, x);
+			statement.setDouble(5, y);
+			statement.setDate(6, Date.valueOf(creationDate));
+			statement.setInt(7, area);
+			statement.setInt(8, numberOfRooms);
+			statement.setInt(9, height);
+			statement.setBoolean(10, isNew);
+			statement.setObject(11, transport.toString());
+			statement.setString(12, houseName);
+			statement.setInt(13, year);
+			statement.setLong(14, numberOfFloors);
+			statement.setLong(15, numberOfLifts);
+			
+			flat.setId(id);
+			statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public int removeFlatById(long id) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("delete from flats where id = ?");
+			statement.setLong(1, id);
+			return statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	public boolean removeFlatsByUser(User user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("DELETE from flats where \"userName\"=?");
+			statement.setString(1, user.getUsername());
+			statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean updateFlatById(long id, Flat flat) {
+		try {
+			PreparedStatement statement = connection.prepareStatement(
+					"update flats set \"flatName\"=?, x=? , y=?, \"creationDate\"=?, area=?, \"numberOfRooms\"=?," +
+							" height=?, \"isNew\"=?, transport=cast (? as transport), \"houseName\"=?, year=?," +
+							" \"numberOfFloors\"=?, \"numberOfLifts\"=?" +
+							" where id = ?");
+			
+			statement.setString(1, flat.getFlatName());
+			statement.setFloat(2, flat.getX());
+			statement.setDouble(3, flat.getY());
+			statement.setDate(4, Date.valueOf(flat.getCreationDate()));
+			statement.setInt(5, flat.getArea());
+			statement.setInt(6, flat.getNumberOfRooms());
+			statement.setInt(7, flat.getHeight());
+			statement.setBoolean(8, flat.getIsNew());
+			statement.setObject(9, flat.getTransport().toString());
+			statement.setString(10, flat.getHouseName());
+			statement.setInt(11, flat.getYear());
+			statement.setLong(12, flat.getNumberOfFloors());
+			statement.setLong(13, flat.getNumberOfLifts());
+			statement.setLong(14, id);
+			
+			statement.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

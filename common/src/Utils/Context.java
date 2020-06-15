@@ -19,7 +19,8 @@ public class Context {
 	
 	public Context() {
 		this.dataBaseManager = new DataBaseManager(new UrlGetterSsh(), new CredentialsGetterRaw());
-		this.collectionManager = new CollectionManager(dataBaseManager);
+		this.collectionManager = new CollectionManager();
+		this.collectionManager.setCollection(dataBaseManager);
 		this.commandsHolder = new CommandsHolder();
 		this.csvSaver = new CSVSaver();
 		

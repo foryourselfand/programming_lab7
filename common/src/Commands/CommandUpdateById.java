@@ -32,22 +32,21 @@ public class CommandUpdateById extends CommandWithNotEmptyCollection implements 
 	@Override
 	public void execute(Context context, SessionServerClient session) {
 		long idToRemove = Long.parseLong(commandArguments[0]);
-		removeFlatOld(context, session, idToRemove);
-		addFlatNew(context, session, flatNew);
+		
+		context.collectionManager.getCollection().forEach(flat->{
+			if (flat.getId() == idToRemove && flat.getUserName().equals(session.getUser().getUsername())) {
+				context.dataBaseManager.updateFlatById(idToRemove, flatNew);
+				
+				context.collectionManager.removeFlatFromCollectionById(idToRemove);
+				context.collectionManager.addFlatToCollection(flatNew);
+				
+				session.append("Обновлен элемент с id ").append(idToRemove).append("\n");
+			}
+		});
 	}
 	
 	private Flat createFlatNew() {
 		return FlatCreator.getCreatedFlatFromTerminal(Context.lineReader);
-	}
-	
-	private void removeFlatOld(Context context, SessionServerClient session, long idToRemove) {
-		context.collectionManager.removeFlatFromCollectionById(idToRemove);
-		session.append("Из коллекции удален элемент с id ").append(idToRemove).append("\n");
-	}
-	
-	private void addFlatNew(Context context, SessionServerClient session, Flat flatNew) {
-		context.collectionManager.addFlatToCollection(flatNew);
-		session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 	}
 	
 	@Override

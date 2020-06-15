@@ -26,22 +26,24 @@ public class CommandRemoveGreater extends CommandWithNotEmptyCollection implemen
 		
 		int collectionSizeStart = context.collectionManager.getCollectionSize();
 		
-		context.collectionManager.getCollection().removeIf(flat->flat.compareTo(flatNew) < 0);
-		Context.idGenerator.getIds().removeIf(id->flatNew.getId().equals(id));
+		List<Long> idsToRemove = context.collectionManager.getCollection()
+				.stream()
+				.filter(flat->flat.compareTo(flatNew) < 0 && flat.getUserName().equals(session.getUser().getUsername()))
+				.map(Flat::getId)
+				.collect(Collectors.toList());
+		
+		idsToRemove.forEach(id->{
+			context.collectionManager.removeFlatFromCollectionById(id);
+			context.dataBaseManager.removeFlatById(id);
+		});
 		
 		int collectionSizeEnd = context.collectionManager.getCollectionSize();
 		boolean isCollectionSizeChanged = collectionSizeEnd != collectionSizeStart;
 		
-		if (isCollectionSizeChanged) {
-			List<Long> idsGreater = context.collectionManager.getCollection()
-					.stream()
-					.map(Flat::getId)
-					.sorted()
-					.collect(Collectors.toList());
-			session.append("Удаленные элементы").append(idsGreater.toString()).append("\n");
-		} else {
-			session.append("В коллекции нет элементов превышающих заданный").append("\n");
-		}
+		if (isCollectionSizeChanged)
+			session.append("Из коллекции удалены элементы превышающих заданный").append("\n");
+		else
+			session.append("В коллекции нет принадлежащих вам элементов превышающих заданный").append("\n");
 	}
 	
 	private Flat getCreatedFlat() {

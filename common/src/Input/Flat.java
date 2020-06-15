@@ -1,6 +1,7 @@
 package Input;
 
 import Generators.CreationDateGenerator;
+import Session.User;
 import SourseReaders.SourceReader;
 import Utils.Context;
 import Utils.LineReader;
@@ -17,6 +18,7 @@ import java.util.Comparator;
 public class Flat implements Comparable<Flat>, Serializable {
 	public static final Comparator<Flat> comparatorByName = Comparator.comparing(Flat::getFlatName);
 	private Long id; // Поле не может быть null, значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+	private String userName;
 	private String flatName; //Поле не может быть null, Строка не может быть пустой
 	private Coordinates coordinates; //Поле не может быть null
 	private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генирироваться автоматически
@@ -30,8 +32,9 @@ public class Flat implements Comparable<Flat>, Serializable {
 	public Flat() {
 	}
 	
-	public Flat(Long id, String flatName, Coordinates coordinates, LocalDate creationDate, int area, int numberOfRooms, Integer height, Boolean isNew, Transport transport, House house) {
+	public Flat(Long id, String userName, String flatName, Coordinates coordinates, LocalDate creationDate, int area, int numberOfRooms, Integer height, Boolean isNew, Transport transport, House house) {
 		this.id = id;
+		this.userName = userName;
 		this.flatName = flatName;
 		this.coordinates = coordinates;
 		this.creationDate = creationDate;
@@ -47,6 +50,7 @@ public class Flat implements Comparable<Flat>, Serializable {
 	public String toString() {
 		return "Flat{" +
 				"id=" + id +
+				", userName='" + userName + '\'' +
 				", flatName='" + flatName + '\'' +
 				", coordinates=" + coordinates +
 				", creationDate=" + creationDate +
@@ -81,8 +85,16 @@ public class Flat implements Comparable<Flat>, Serializable {
 		this.id = ValueReader.getRead(lineReader, sourceReader, Long.class, Variable.ID);
 	}
 	
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 	public Long getId() {
 		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	public void setFlatName(LineReader lineReader, SourceReader sourceReader) {
@@ -123,6 +135,14 @@ public class Flat implements Comparable<Flat>, Serializable {
 	
 	public void setCreationDate(LineReader lineReader, SourceReader sourceReader) {
 		this.creationDate = ValueReader.getRead(lineReader, sourceReader, LocalDate.class, Variable.CREATION_DATE, "parse", CharSequence.class);
+	}
+	
+	public String getUserName() {
+		return userName;
+	}
+	
+	public Boolean getNew() {
+		return isNew;
 	}
 	
 	public LocalDate getCreationDate() {

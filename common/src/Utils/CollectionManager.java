@@ -13,9 +13,15 @@ public class CollectionManager {
 	private final CopyOnWriteArraySet<Flat> collection;
 	private LocalDate initializationDate;
 	
-	public CollectionManager(DataBaseManager dataBaseManager) {
-		this.collection = dataBaseManager.getCollectionFromDatabase();
+	public CollectionManager() {
+		this.collection = new CopyOnWriteArraySet<>();
 		this.initializationDate = Context.INITIALIZATION_DATE;
+	}
+	
+	public void setCollection(DataBaseManager dataBaseManager) {
+		CopyOnWriteArraySet<Flat> collectionDB = dataBaseManager.getCollectionFromDatabase();
+		for (Flat flat : collectionDB)
+			addFlatToCollection(flat);
 	}
 	
 	public CopyOnWriteArraySet<Flat> getCollection() {

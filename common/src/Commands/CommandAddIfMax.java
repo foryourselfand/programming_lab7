@@ -45,6 +45,7 @@ public class CommandAddIfMax extends Command implements CommandAuthorized {
 	
 	private void addFlatNewToCollection(Context context, SessionServerClient session, Flat flatNew) {
 		session.append("Значение нового элемента превышает значение наибольшего элемента коллекции\n");
+		context.dataBaseManager.addFlat(flatNew, session);
 		context.collectionManager.addFlatToCollection(flatNew);
 		session.append("В коллекцию добавлен элемент ").append(flatNew.toString()).append("\n");
 	}

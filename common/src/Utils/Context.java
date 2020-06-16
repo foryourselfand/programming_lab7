@@ -14,7 +14,6 @@ public class Context {
 	public static LineReader lineReader = new LineReader();
 	public CommandsHolder commandsHolder;
 	public CollectionManager collectionManager;
-	public CSVSaver csvSaver;
 	public DataBaseManager dataBaseManager;
 	
 	public Context() {
@@ -22,7 +21,5 @@ public class Context {
 		this.collectionManager = new CollectionManager();
 		this.collectionManager.setCollection(dataBaseManager);
 		this.commandsHolder = new CommandsHolder();
-		this.csvSaver = new CSVSaver();
-		
 	}
 }

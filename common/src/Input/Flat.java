@@ -77,9 +77,9 @@ public class Flat implements Comparable<Flat>, Serializable {
 				.compare(this, flat);
 	}
 	
-	public void generateId() {
-		this.id = Context.idGenerator.generateId();
-	}
+//	public void generateId() {
+//		this.id = Context.idGenerator.generateId();
+//	}
 	
 	public void setId(LineReader lineReader, SourceReader sourceReader) {
 		this.id = ValueReader.getRead(lineReader, sourceReader, Long.class, Variable.ID);

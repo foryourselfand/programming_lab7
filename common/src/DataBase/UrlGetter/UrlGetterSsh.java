@@ -13,7 +13,7 @@ public class UrlGetterSsh extends UrlGetter {
 		String pass = "rpp013";
 		
 		String listenerHost = "localhost";
-		int listenerPort = 8666;
+		int listenerPort = 8012;
 		
 		String listeningHost = "pg";
 		int listeningPort = 5432;

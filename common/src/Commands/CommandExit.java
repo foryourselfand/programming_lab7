@@ -10,6 +10,10 @@ public class CommandExit extends Command {
 	
 	@Override
 	public void execute(Context context, SessionServerClient session) {
+	}
+	
+	@Override
+	public void postExecute() {
 		exit();
 	}
 	
@@ -24,6 +28,6 @@ public class CommandExit extends Command {
 	
 	@Override
 	public String getDescription() {
-		return "завершить программу (с сохранением в временный файл)";
+		return "завершить программу";
 	}
 }

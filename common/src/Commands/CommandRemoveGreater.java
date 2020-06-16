@@ -36,14 +36,7 @@ public class CommandRemoveGreater extends CommandWithNotEmptyCollection implemen
 			context.collectionManager.removeFlatFromCollectionById(id);
 			context.dataBaseManager.removeFlatById(id);
 		});
-		
-		int collectionSizeEnd = context.collectionManager.getCollectionSize();
-		boolean isCollectionSizeChanged = collectionSizeEnd != collectionSizeStart;
-		
-		if (isCollectionSizeChanged)
-			session.append("Из коллекции удалены элементы превышающих заданный").append("\n");
-		else
-			session.append("В коллекции нет принадлежащих вам элементов превышающих заданный").append("\n");
+		session.append("Из коллекции удалены принадлежащие вам элементы превышающие заданные");
 	}
 	
 	private Flat getCreatedFlat() {

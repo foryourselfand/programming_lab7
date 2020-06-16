@@ -35,6 +35,9 @@ public class CommandUpdateById extends CommandWithNotEmptyCollection implements 
 		
 		context.collectionManager.getCollection().forEach(flat->{
 			if (flat.getId() == idToRemove && flat.getUserName().equals(session.getUser().getUsername())) {
+				flatNew.setId(flat.getId());
+				flatNew.setUserName(flat.getUserName());
+				
 				context.dataBaseManager.updateFlatById(idToRemove, flatNew);
 				
 				context.collectionManager.removeFlatFromCollectionById(idToRemove);

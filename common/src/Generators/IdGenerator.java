@@ -13,16 +13,6 @@ public class IdGenerator {
 		return ids;
 	}
 	
-	public Long generateId() {
-		long randomizedId;
-		do {
-			randomizedId = RandomHolder.getInstance().random.nextLong();
-		} while (randomizedId <= 0 || ids.contains(randomizedId));
-		
-		ids.add(randomizedId);
-		return randomizedId;
-	}
-	
 	public void clear() {
 		ids.clear();
 	}

@@ -63,6 +63,9 @@ public abstract class Command implements Serializable {
 		return null;
 	}
 	
+	public void postExecute(){
+	}
+	
 	public abstract void execute(Context context, SessionServerClient session);
 	
 	public String getArgumentsDescription() {

@@ -17,7 +17,7 @@ public class FlatCreator {
 		
 		Flat flat = new Flat();
 		
-		flat.generateId();
+//		flat.generateId();
 		flat.setFlatName(lineReader, sourceReaderActive);
 		
 		flat.createCoordinates();
